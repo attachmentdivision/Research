@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AICAD Research: Comprehensive Analytics (v18)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Work Sans', sans-serif;
+            background-color: #fafafa;
+            color: #1a1a1a;
+        }
+
+        .chart-box {
+            background: white;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .chart-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #1f2937;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            flex-grow: 1;
+        }
+
+        .spreadsheet-table th {
+            background-color: #ffffff;
+            color: #1a1a1a;
+            border-bottom: 2px solid #e5e5e5;
+            padding: 10px 12px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            white-space: nowrap;
+        }
+
+        .spreadsheet-table td {
+            border-bottom: 1px solid #f0f0f0;
+            padding: 10px 12px;
+            font-size: 0.8rem;
+            background-color: #ffffff;
+        }
+
+        .meca-row td {
+            background-color: #fef08a !important;
+            border-bottom: 1px solid #eab308;
+            color: #000000;
+            font-weight: 600;
+        }
+
+        .spreadsheet-table tr:hover td:not(.meca-highlight) {
+            background-color: #f9fafb;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 8px;
+            width: 8px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #d4d4d4;
+            border-radius: 4px;
+        }
+
+        .btn-clean {
+            background-color: #ffffff;
+            color: #1a1a1a;
+            border: 1px solid #e5e5e5;
+            transition: all 0.2s;
+        }
+
+        .btn-clean:hover {
+            border-color: #FACC15;
+            color: #000000;
+            background-color: #fffbeb;
+        }
+
+        .source-link {
+            font-size: 0.65rem;
+            color: #9ca3af;
+            margin-top: auto;
+            padding-top: 10px;
+            border-top: 1px solid #f3f4f6;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .source-link a:hover {
+            text-decoration: underline;
+            color: #000;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-4">
+                <div class="bg-black text-white font-bold text-lg px-3 py-1 rounded-sm">AICAD</div>
+                <div>
+                    <h1 class="text-lg font-bold text-gray-900 tracking-tight">Consortium Research Data</h1>
+                    <p class="text-xs text-gray-500 font-medium">MECA&D FN 113 Curriculum Planning • Fall 2026</p>
+                </div>
+            </div>
+            <button onclick="downloadCSV()"
+                class="bg-white border border-gray-200 text-gray-800 text-xs font-bold py-2 px-4 rounded-sm hover:bg-yellow-50 hover:border-yellow-400 transition-all shadow-sm">Download
+                Full Dataset</button>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-8 space-y-8">
+
+        <!-- ROW 1: TRENDS -->
+        <section class="chart-box w-full">
+            <div class="chart-header">
+                <div>
+                    <h2 class="chart-title">BFA Conferral Trends (2006-2021)</h2>
+                    <p class="text-xs text-gray-500 mt-1"><span class="font-bold text-black">2006–2011:</span> Actuals |
+                        <span class="font-bold text-gray-400">2012–2021:</span> Projected</p>
+                </div>
+            </div>
+            <div class="chart-container" style="height: 350px;"><canvas id="trendsChart"></canvas></div>
+            <div class="source-link"><span>Major Popularity over Time</span><span class="font-mono">Source: Internal
+                    Records (Data.csv)</span></div>
+        </section>
+
+        <!-- ROW 2: SPLIT SCATTERS -->
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="chart-box">
+                <div class="chart-header">
+                    <h3 class="chart-title">Tuition vs. Net Price</h3>
+                    <div class="text-xs text-gray-400">2023-24 Est.</div>
+                </div>
+                <div class="chart-container" style="height: 300px;"><canvas id="tuitionChart"></canvas></div>
+                <div class="source-link"><span>Affordability Matrix</span><a href="https://collegescorecard.ed.gov/"
+                        target="_blank">Source: U.S. Dept of Ed ↗</a></div>
+            </div>
+            <div class="chart-box">
+                <div class="chart-header">
+                    <h3 class="chart-title">Enrollment vs. Majors</h3>
+                </div>
+                <div class="chart-container" style="height: 300px;"><canvas id="majorsChart"></canvas></div>
+                <div class="source-link"><span>Curricular Breadth</span><a href="https://www.aicad.org/"
+                        target="_blank">Source: AICAD ↗</a></div>
+            </div>
+            <div class="chart-box">
+                <div class="chart-header">
+                    <h3 class="chart-title">Enrollment vs. Minors</h3>
+                </div>
+                <div class="chart-container" style="height: 300px;"><canvas id="minorsChart"></canvas></div>
+                <div class="source-link"><span>Curricular Breadth</span><a href="https://www.aicad.org/"
+                        target="_blank">Source: AICAD ↗</a></div>
+            </div>
+        </section>
+
+        <!-- ROW 3: UNGROUPED RANKINGS -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="chart-box">
+                <div class="chart-header">
+                    <h3 class="chart-title">Selectivity Ranking</h3>
+                </div>
+                <div class="chart-container" style="height: 600px;"><canvas id="barChart"></canvas></div>
+                <div class="source-link"><span>Acceptance Rates (%)</span><a href="https://nces.ed.gov/ipeds/"
+                        target="_blank">Source: IPEDS ↗</a></div>
+            </div>
+            <div class="chart-box">
+                <div class="chart-header">
+                    <h3 class="chart-title">Enrollment Ranking</h3>
+                </div>
+                <div class="chart-container" style="height: 600px;"><canvas id="enrollmentHist"></canvas></div>
+                <div class="source-link"><span>Student Body Size</span><a href="https://nces.ed.gov/ipeds/"
+                        target="_blank">Source: IPEDS ↗</a></div>
+            </div>
+        </section>
+
+        <!-- TABLE -->
+        <section class="flex flex-col h-[700px] bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+            <div class="p-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+                <h2 class="font-bold text-sm text-gray-700 uppercase tracking-wide">AICAD Member Directory</h2>
+                <span class="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded" id="tableCount">Loading...</span>
+            </div>
+            <div class="overflow-auto custom-scrollbar flex-grow relative">
+                <table class="w-full spreadsheet-table text-left border-collapse" id="mainTable">
+                    <thead>
+                        <tr>
+                            <th class="w-16 text-center">View</th>
+                            <th onclick="sortTable('name')" class="cursor-pointer hover:text-yellow-600">Institution ↕
+                            </th>
+                            <th onclick="sortTable('location')" class="cursor-pointer hover:text-yellow-600">Location ↕
+                            </th>
+                            <th onclick="sortTable('enrollment')"
+                                class="cursor-pointer hover:text-yellow-600 text-right">Enrollment ↕</th>
+                            <th onclick="sortTable('acceptance')"
+                                class="cursor-pointer hover:text-yellow-600 text-right">Acceptance ↕</th>
+                            <th onclick="sortTable('tuition')"
+                                class="cursor-pointer hover:text-yellow-600 text-right bg-gray-50">Tuition ↕</th>
+                            <th onclick="sortTable('netPrice')"
+                                class="cursor-pointer hover:text-yellow-600 text-right bg-gray-50">Net Price ↕</th>
+                            <th onclick="sortTable('majors')" class="cursor-pointer hover:text-yellow-600 text-right">
+                                Majors ↕</th>
+                            <th onclick="sortTable('minors')" class="cursor-pointer hover:text-yellow-600 text-right">
+                                Minors ↕</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="detailsPanel"
+            class="hidden fixed bottom-0 left-0 right-0 bg-white border-t-4 border-yellow-400 shadow-2xl z-40 max-h-[60vh] overflow-y-auto fade-in p-8">
+            <button onclick="closeDetails()"
+                class="absolute top-4 right-4 font-bold text-xl hover:text-red-500">×</button>
+            <h2 id="detailName" class="text-3xl font-bold text-gray-900 mb-2"></h2>
+            <p id="detailStats" class="text-gray-500 text-sm mb-6 pb-4 border-b border-gray-100"></p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="font-bold uppercase text-xs mb-2">Majors</h3>
+                    <ul id="detailMajorsList" class="text-sm list-disc pl-4 space-y-1"></ul>
+                </div>
+                <div>
+                    <h3 class="font-bold uppercase text-xs mb-2">Minors</h3>
+                    <ul id="detailMinorsList" class="text-sm list-disc pl-4 space-y-1"></ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        Chart.defaults.font.family = "'Work Sans', sans-serif"; Chart.defaults.color = '#525252'; Chart.defaults.scale.grid.color = '#f5f5f5';
+
+        // COMPACTED DATASET TO PREVENT TRUNCATION
+        const aicadData = [
+            { name: "Maine College of Art & Design", location: "Portland, ME", founded: 1882, enrollment: 550, acceptance: 76, tuition: 39500, netPrice: 24500, majors: 11, minors: 7, majorList: ["Animation & Game Art", "Ceramics", "Graphic Design", "Illustration", "Metalsmithing", "Painting", "Photography", "Printmaking", "Sculpture", "Textile & Fashion", "Woodworking"], minorList: ["Art History", "Drawing", "Writing", "Public Engagement", "Sustainability", "Music", "Entrepreneurship"] },
+            { name: "Montserrat College of Art", location: "Beverly, MA", founded: 1970, enrollment: 365, acceptance: 82, tuition: 35800, netPrice: 26000, majors: 10, minors: 6, majorList: ["Animation", "Art Ed", "Book Arts", "Game Design", "Graphic Design", "Illustration", "Interdisciplinary", "Painting", "Photo", "Printmaking", "Sculpture"], minorList: ["Art History", "Creative Writing", "Curatorial", "Entrepreneurship"] },
+            { name: "Rhode Island School of Design", location: "Providence, RI", founded: 1877, enrollment: 2620, acceptance: 19, tuition: 58500, netPrice: 41000, majors: 16, minors: 7, majorList: ["Apparel", "Architecture", "Ceramics", "Film/Animation", "Glass", "Graphic Design", "Illustration", "Industrial Design", "Interior Arch", "Jewelry", "Painting", "Photo", "Printmaking", "Sculpture", "Textiles"], minorList: ["Computation", "Drawing", "History of Art", "Nature-Culture", "Liberal Arts"] },
+            { name: "School of the Art Institute of Chicago", location: "Chicago, IL", founded: 1866, enrollment: 3530, acceptance: 79, tuition: 55800, netPrice: 34500, majors: 1, minors: 0, majorList: ["Interdisciplinary Studio"], minorList: ["None (Open Curriculum)"] },
+            { name: "California Institute of the Arts", location: "Santa Clarita, CA", founded: 1961, enrollment: 1440, acceptance: 25, tuition: 56000, netPrice: 42000, majors: 6, minors: 6, majorList: ["Art", "Critical Studies", "Dance", "Film/Video", "Music", "Theater"], minorList: ["Digital Arts", "Creative Writing", "Sound", "Social Practice"] },
+            { name: "Maryland Institute College of Art", location: "Baltimore, MD", founded: 1826, enrollment: 2140, acceptance: 80, tuition: 54500, netPrice: 31000, majors: 19, minors: 18, majorList: ["Animation", "Ceramics", "Graphic Design", "Illustration", "Painting", "Photo", "Product Design", "Sculpture", "Printmaking"], minorList: ["Art History", "Curatorial", "Film", "Sound Art", "Game Design"] },
+            { name: "Pratt Institute", location: "Brooklyn, NY", founded: 1887, enrollment: 5100, acceptance: 50, tuition: 57600, netPrice: 38000, majors: 22, minors: 25, majorList: ["Architecture", "Comm Design", "Digital Arts", "Fashion", "Fine Arts", "Industrial Design", "Interior Design"], minorList: ["Cinema Studies", "Sustainability", "Photo", "Psychology"] },
+            { name: "Parsons School of Design", location: "New York, NY", founded: 1896, enrollment: 5600, acceptance: 46, tuition: 59000, netPrice: 45000, majors: 30, minors: 40, majorList: ["Comm Design", "Fashion", "Fine Arts", "Illustration", "Interior Design", "Photo", "Product Design"], minorList: ["Data Viz", "Fashion Studies", "Temp Environments"] },
+            { name: "ArtCenter College of Design", location: "Pasadena, CA", founded: 1930, enrollment: 2420, acceptance: 55, tuition: 51000, netPrice: 39000, majors: 11, minors: 5, majorList: ["Advertising", "Entertainment Design", "Film", "Fine Art", "Graphic Design", "Illustration", "Interaction", "Product Design", "Transportation"], minorList: ["Social Innovation", "Creative Writing"] },
+            { name: "California College of the Arts", location: "San Francisco, CA", founded: 1907, enrollment: 1620, acceptance: 85, tuition: 56500, netPrice: 35000, majors: 22, minors: 11, majorList: ["Animation", "Architecture", "Fashion", "Film", "Furniture", "Graphic Design", "Illustration", "Interaction", "Industrial Design", "Painting"], minorList: ["Ecological Practices", "Visual Studies"] },
+            { name: "Ringling College of Art and Design", location: "Sarasota, FL", founded: 1931, enrollment: 1700, acceptance: 65, tuition: 52000, netPrice: 38000, majors: 13, minors: 10, majorList: ["Computer Animation", "Entertainment Design", "Film", "Game Art", "Graphic Design", "Illustration", "Motion Design", "VR"], minorList: ["Business", "Creative Writing"] },
+            { name: "School of Visual Arts", location: "New York, NY", founded: 1947, enrollment: 4100, acceptance: 71, tuition: 48000, netPrice: 40000, majors: 11, minors: 0, majorList: ["Advertising", "Animation", "Cartooning", "Computer Art", "Design", "Film", "Fine Arts", "Illustration", "Photo", "Visual Studies"], minorList: ["Honors Only"] },
+            { name: "Otis College of Art and Design", location: "Los Angeles, CA", founded: 1918, enrollment: 1300, acceptance: 80, tuition: 53500, netPrice: 36000, majors: 11, minors: 18, majorList: ["Comm Arts", "Digital Media", "Environmental Design", "Fashion", "Fine Arts", "Product Design", "Toy Design"], minorList: ["Advertising", "Book Arts", "Sustainability"] },
+            { name: "Minneapolis College of Art and Design", location: "Minneapolis, MN", founded: 1886, enrollment: 800, acceptance: 57, tuition: 43000, netPrice: 28000, majors: 14, minors: 12, majorList: ["Animation", "Comic Art", "Drawing", "Furniture", "Graphic Design", "Illustration", "Web"], minorList: ["Advertising", "Art History", "Teaching Artist"] },
+            { name: "MassArt", location: "Boston, MA", founded: 1873, enrollment: 1950, acceptance: 73, tuition: 40000, netPrice: 22000, majors: 18, minors: 10, majorList: ["Animation", "Architecture", "Ceramics", "Fashion", "Glass", "Industrial Design", "Jewelry", "Painting", "Photo"], minorList: ["Video", "Sustainability"] },
+            { name: "College for Creative Studies", location: "Detroit, MI", founded: 1906, enrollment: 1400, acceptance: 55, tuition: 49500, netPrice: 32000, majors: 13, minors: 9, majorList: ["Advertising", "Comm Design", "Crafts", "Entertainment Arts", "Fashion", "Illustration", "Interior Design", "Product Design", "Transportation"], minorList: ["Art Therapy", "Business"] },
+            { name: "Cleveland Institute of Art", location: "Cleveland, OH", founded: 1882, enrollment: 600, acceptance: 68, tuition: 45000, netPrice: 29000, majors: 13, minors: 5, majorList: ["Animation", "Ceramics", "Drawing", "Game Design", "Glass", "Graphic Design", "Illustration", "Industrial Design", "Interior Arch", "Life Sciences"], minorList: ["Visual Culture"] },
+            { name: "Columbus College of Art & Design", location: "Columbus, OH", founded: 1879, enrollment: 1010, acceptance: 88, tuition: 40000, netPrice: 26000, majors: 12, minors: 20, majorList: ["Animation", "Comics", "Fashion", "Film", "Fine Arts", "Game Art", "Illustration", "Industrial Design", "Interior Arch", "Photo"], minorList: ["Advertising", "Art Therapy", "Business"] },
+            { name: "Kansas City Art Institute", location: "Kansas City, MO", founded: 1885, enrollment: 700, acceptance: 63, tuition: 42500, netPrice: 28500, majors: 13, minors: 5, majorList: ["Animation", "Ceramics", "Fiber", "Filmmaking", "Graphic Design", "Illustration", "Painting", "Photo", "Printmaking", "Product Design", "Sculpture"], minorList: ["Art History", "Social Practice"] },
+            { name: "Milwaukee Institute of Art & Design", location: "Milwaukee, WI", founded: 1974, enrollment: 920, acceptance: 62, tuition: 41000, netPrice: 25500, majors: 5, minors: 10, majorList: ["Comm Design", "Illustration", "Interior Arch", "New Studio Practice", "Product Design"], minorList: ["Arts Mgmt", "Digital Media"] },
+            { name: "Laguna College of Art + Design", location: "Laguna Beach, CA", founded: 1961, enrollment: 750, acceptance: 83, tuition: 36000, netPrice: 32000, majors: 7, minors: 5, majorList: ["Animation", "Design/Digital Media", "Drawing/Painting", "Entertainment Design", "Game Art", "Graphic Design", "Illustration"], minorList: ["Creative Writing", "Sculpture"] },
+            { name: "Cornish College of the Arts", location: "Seattle, WA", founded: 1914, enrollment: 600, acceptance: 71, tuition: 37000, netPrice: 31000, majors: 8, minors: 0, majorList: ["Art", "Design", "Film", "Interior Arch", "Performance", "Dance", "Music", "Theater"], minorList: ["N/A"] },
+            { name: "Moore College of Art & Design", location: "Philadelphia, PA", founded: 1848, enrollment: 380, acceptance: 50, tuition: 46000, netPrice: 27000, majors: 9, minors: 10, majorList: ["Animation/Game", "Art Ed", "Fashion", "Film", "Graphic Design", "Illustration", "Interior Design", "Photo", "Fine Arts"], minorList: ["Business", "Textiles"] },
+            { name: "Cooper Union", location: "New York, NY", founded: 1859, enrollment: 850, acceptance: 15, tuition: 44550, netPrice: 15000, majors: 3, minors: 0, majorList: ["Art", "Architecture", "Engineering"], minorList: ["Humanities"] },
+            { name: "Pacific Northwest College of Art", location: "Portland, OR", founded: 1909, enrollment: 450, acceptance: 90, tuition: 43000, netPrice: 26000, majors: 8, minors: 6, majorList: ["Animated Arts", "General Fine Arts", "Graphic Design", "Illustration", "Intermedia", "Painting", "Photo", "Printmaking"], minorList: ["Art History", "Game", "Creative Writing"] },
+            { name: "Lesley Art and Design", location: "Cambridge, MA", founded: 1848, enrollment: 1500, acceptance: 84, tuition: 32000, netPrice: 24000, majors: 10, minors: 15, majorList: ["Animation", "Design", "Digital Film", "Fine Arts", "Illustration", "Interactive Design", "Photo"], minorList: ["Art History", "Design for Social Change"] },
+            { name: "Emily Carr University", location: "Vancouver, BC", founded: 1925, enrollment: 1800, acceptance: 50, tuition: 18000, netPrice: 15000, majors: 11, minors: 5, majorList: ["Animation", "Ceramics", "Drawing", "Illustration", "Industrial Design", "Interaction", "New Media", "Painting", "Photo"], minorList: ["Curatorial", "Social Practice"] },
+            { name: "OCAD University", location: "Toronto, ON", founded: 1876, enrollment: 4500, acceptance: 60, tuition: 26000, netPrice: 20000, majors: 18, minors: 15, majorList: ["Advertising", "Criticism", "Digital Futures", "Drawing/Painting", "Environmental Design", "Graphic Design", "Illustration", "Industrial Design", "Material Art", "Photo"], minorList: ["Art History", "Games"] },
+            { name: "Alberta University of the Arts", location: "Calgary, AB", founded: 1926, enrollment: 1100, acceptance: 60, tuition: 16000, netPrice: 12000, majors: 11, minors: 0, majorList: ["Ceramics", "Drawing", "Fibre", "Glass", "Jewellery", "Media Arts", "Painting", "Print", "Sculpture", "Vis Comm"], minorList: ["N/A"] },
+            { name: "NSCAD University", location: "Halifax, NS", founded: 1887, enrollment: 900, acceptance: 70, tuition: 19000, netPrice: 14000, majors: 12, minors: 8, majorList: ["Fine Art", "Design", "Craft", "Media Arts", "Art History"], minorList: ["Film", "Fashion"] },
+            { name: "Pennsylvania College of Art & Design", location: "Lancaster, PA", founded: 1982, enrollment: 250, acceptance: 93, tuition: 28000, netPrice: 23000, majors: 6, minors: 4, majorList: ["Animation/Game", "Fine Art", "Graphic Design", "Illustration", "Live Experience", "Photo"], minorList: ["Business", "Creative Writing"] },
+            { name: "DCAD", location: "Wilmington, DE", founded: 1997, enrollment: 150, acceptance: 95, tuition: 27000, netPrice: 18000, majors: 5, minors: 0, majorList: ["Animation", "Fine Arts", "Graphic Design", "Illustration", "Photo"], minorList: ["N/A"] }
+        ];
+
+        document.getElementById('tableCount').innerText = `${aicadData.length} Schools`;
+
+        const years = [2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021];
+        const trendData = {
+            graphic: [3821, 4034, 4527, 4790, 5347, 5600, 6042, 6294, 6250, 6056, 5837, 5197, 4798, 4926, 5094, 5207],
+            animation: [1348, 1799, 2602, 2829, 2561, 2177, 2163, 2205, 2231, 2242, 2249, 2307, 2161, 2388, 2535, 2699],
+            illustration: [866, 959, 1308, 1275, 1225, 1418, 1559, 1704, 1836, 1918, 1928, 1877, 1920, 2000, 2067, 2034],
+            fashion: [1689, 1852, 1973, 2181, 2284, 2405, 2396, 2479, 2320, 2329, 2169, 2119, 2081, 1917, 2009, 1914],
+            photo: [1869, 1852, 1892, 1815, 1967, 1832, 1924, 1967, 1901, 1759, 1576, 1448, 1294, 1219, 1303, 1159],
+            painting: [793, 826, 858, 813, 738, 681, 737, 771, 736, 720, 656, 605, 621, 568, 567, 501],
+            crafts: [173, 187, 130, 166, 152, 155, 132, 151, 132, 141, 127, 125, 119, 96, 76, 71],
+            sculpture: [284, 302, 336, 326, 313, 315, 330, 295, 297, 328, 263, 245, 203, 235, 226, 180],
+            print: [158, 181, 151, 150, 189, 208, 188, 220, 179, 153, 144, 154, 127, 144, 126, 119],
+            ceramics: [201, 231, 233, 210, 224, 187, 214, 214, 236, 211, 181, 99, 104, 96, 85, 72],
+            jewelry: [110, 108, 126, 119, 114, 105, 130, 106, 122, 110, 113, 115, 110, 108, 88, 61]
+        };
+
+        const configTrend = {
+            type: 'line',
+            data: {
+                labels: years,
+                datasets: [
+                    { label: 'Graphic Design', data: trendData.graphic, fill: true, backgroundColor: '#4338ca', borderColor: '#4338ca', tension: 0.3, pointRadius: 0 },
+                    { label: 'Animation', data: trendData.animation, fill: true, backgroundColor: '#be185d', borderColor: '#be185d', tension: 0.3, pointRadius: 0 },
+                    { label: 'Illustration', data: trendData.illustration, fill: true, backgroundColor: '#059669', borderColor: '#059669', tension: 0.3, pointRadius: 0 },
+                    { label: 'Fashion', data: trendData.fashion, fill: true, backgroundColor: '#d97706', borderColor: '#d97706', tension: 0.3, pointRadius: 0 },
+                    { label: 'Photo', data: trendData.photo, fill: true, backgroundColor: '#4f46e5', borderColor: '#4f46e5', tension: 0.3, pointRadius: 0 },
+                    { label: 'Painting', data: trendData.painting, fill: true, backgroundColor: '#7c3aed', borderColor: '#7c3aed', tension: 0.3, pointRadius: 0 },
+                    { label: 'Sculpture', data: trendData.sculpture, fill: true, backgroundColor: '#4b5563', borderColor: '#4b5563', tension: 0.3, pointRadius: 0 },
+                    { label: 'Ceramics', data: trendData.ceramics, fill: true, backgroundColor: '#dc2626', borderColor: '#dc2626', tension: 0.3, pointRadius: 0 },
+                    { label: 'Print', data: trendData.print, fill: true, backgroundColor: '#0284c7', borderColor: '#0284c7', tension: 0.3, pointRadius: 0 },
+                    { label: 'Crafts', data: trendData.crafts, fill: true, backgroundColor: '#9333ea', borderColor: '#9333ea', tension: 0.3, pointRadius: 0 },
+                    { label: 'Jewelry', data: trendData.jewelry, fill: true, backgroundColor: '#0d9488', borderColor: '#0d9488', tension: 0.3, pointRadius: 0 }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, labels: { usePointStyle: true, boxWidth: 6, font: { size: 9 } } }, tooltip: { mode: 'index', intersect: false } }, scales: { y: { stacked: true, beginAtZero: true, grid: { color: '#f3f4f6' } }, x: { grid: { display: false } } } }
+        };
+        new Chart(document.getElementById('trendsChart'), configTrend);
+
+        // Tuition
+        new Chart(document.getElementById('tuitionChart'), {
+            type: 'scatter',
+            data: { datasets: [{ data: aicadData.map(s => ({ x: s.tuition, y: s.netPrice, school: s.name })), backgroundColor: aicadData.map(s => s.name.includes("Maine") ? '#ca8a04' : '#9ca3af'), pointRadius: aicadData.map(s => s.name.includes("Maine") ? 8 : 4) }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => c.raw.school, afterLabel: c => `Sticker: $${c.raw.x.toLocaleString()} | Net: $${c.raw.y.toLocaleString()}` } } }, scales: { x: { title: { display: true, text: 'Sticker Price' }, ticks: { callback: v => '$' + v / 1000 + 'k' } }, y: { title: { display: true, text: 'Net Price' }, ticks: { callback: v => '$' + v / 1000 + 'k' } } } }
+        });
+
+        // Majors
+        new Chart(document.getElementById('majorsChart'), {
+            type: 'scatter',
+            data: { datasets: [{ data: aicadData.map(s => ({ x: s.enrollment, y: s.majors, school: s.name })), backgroundColor: aicadData.map(s => s.name.includes("Maine") ? '#ca8a04' : '#e5e7eb'), borderColor: aicadData.map(s => s.name.includes("Maine") ? '#854d0e' : '#9ca3af'), borderWidth: 1.5, pointRadius: 5 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => c.raw.school } } }, scales: { x: { title: { display: true, text: 'Enrollment' } }, y: { title: { display: true, text: 'Majors' }, beginAtZero: true } } }
+        });
+
+        // Minors
+        new Chart(document.getElementById('minorsChart'), {
+            type: 'scatter',
+            data: { datasets: [{ data: aicadData.map(s => ({ x: s.enrollment, y: s.minors, school: s.name })), backgroundColor: aicadData.map(s => s.name.includes("Maine") ? '#ca8a04' : '#e5e7eb'), borderColor: aicadData.map(s => s.name.includes("Maine") ? '#854d0e' : '#9ca3af'), borderWidth: 1.5, pointRadius: 5 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => c.raw.school } } }, scales: { x: { title: { display: true, text: 'Enrollment' } }, y: { title: { display: true, text: 'Minors' }, beginAtZero: true } } }
+        });
+
+        // Ungrouped Rankings
+        const selData = [...aicadData].sort((a, b) => a.acceptance - b.acceptance);
+        new Chart(document.getElementById('barChart'), {
+            type: 'bar', data: { labels: selData.map(s => s.name), datasets: [{ data: selData.map(s => s.acceptance), backgroundColor: selData.map(s => s.name.includes("Maine") ? '#facc15' : '#4b5563'), borderRadius: 2 }] },
+            options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, max: 100 }, y: { ticks: { font: { size: 9 }, autoSkip: false } } } }
+        });
+
+        const enrollData = [...aicadData].sort((a, b) => b.enrollment - a.enrollment);
+        new Chart(document.getElementById('enrollmentHist'), {
+            type: 'bar', data: { labels: enrollData.map(s => s.name), datasets: [{ data: enrollData.map(s => s.enrollment), backgroundColor: enrollData.map(s => s.name.includes("Maine") ? '#facc15' : '#1f2937'), borderRadius: 2 }] },
+            options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true }, y: { ticks: { font: { size: 9 }, autoSkip: false } } } }
+        });
+
+        // Table & UI
+        function renderTable(data) {
+            const t = document.getElementById('tableBody'); t.innerHTML = '';
+            data.forEach((s, i) => {
+                const r = document.createElement('tr');
+                if (s.name.includes("Maine")) r.classList.add('meca-row');
+                r.innerHTML = `<td class="text-center"><button onclick="view(${i})" class="btn-clean text-[10px] font-bold px-2 py-1 uppercase rounded-sm">View</button></td><td class="font-bold">${s.name}</td><td class="text-xs uppercase">${s.location}</td><td class="text-right font-mono">${s.enrollment}</td><td class="text-right font-mono font-bold">${s.acceptance}%</td><td class="text-right font-mono bg-gray-50/50">$${s.tuition.toLocaleString()}</td><td class="text-right font-mono font-bold bg-gray-50/50">$${s.netPrice.toLocaleString()}</td><td class="text-right">${s.majors}</td><td class="text-right">${s.minors}</td>`;
+                t.appendChild(r);
+            });
+        }
+        function view(i) {
+            const s = aicadData[i];
+            document.getElementById('detailName').innerText = s.name; document.getElementById('detailLoc').innerText = s.location;
+            document.getElementById('detailStats').innerText = `Est. ${s.founded} | ${s.enrollment} Students`;
+            document.getElementById('detailMajorsList').innerHTML = s.majorList.map(m => `<li>${m}</li>`).join('');
+            document.getElementById('detailMinorsList').innerHTML = s.minorList.map(m => `<li>${m}</li>`).join('');
+            document.getElementById('detailsPanel').classList.remove('hidden');
+        }
+        function closeDetails() { document.getElementById('detailsPanel').classList.add('hidden'); }
+        let sortDir = false;
+        function sortTable(key) {
+            sortDir = !sortDir;
+            aicadData.sort((a, b) => (typeof a[key] === 'string' ? (sortDir ? a[key].localeCompare(b[key]) : b[key].localeCompare(a[key])) : (sortDir ? a[key] - b[key] : b[key] - a[key])));
+            renderTable(aicadData);
+        }
+        function downloadCSV() {
+            let csv = "Institution,Location,Enrollment,Acceptance,Tuition,Net Price,Majors,Minors,List\n";
+            aicadData.forEach(s => { csv += [`"${s.name}"`, `"${s.location}"`, s.enrollment, s.acceptance, s.tuition, s.netPrice, s.majors, s.minors, `"${s.majorList.join(';')}"`].join(",") + "\n"; });
+            const link = document.createElement("a"); link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); link.download = "AICAD_Data.csv"; link.click();
+        }
+        renderTable(aicadData);
+    </script>
+</body>
+
+</html>
